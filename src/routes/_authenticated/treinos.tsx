@@ -123,6 +123,33 @@ function TreinosPage() {
         ) : <Card><p className="text-sm text-muted-foreground">Sem treino programado.</p></Card>}
       </Section>
 
+      <Section title="Semana inteira">
+        <div className="space-y-2">
+          {plan.days.map((d) => {
+            const isToday = d.day_of_week === dow;
+            const isBonus = d.day_of_week === 6;
+            return (
+              <Card key={d.day_of_week} className={isToday ? "border-foreground/60" : ""}>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase">{DAY_LABELS[d.day_of_week - 1]}</span>
+                    {isToday && <span className="text-[10px] px-2 py-0.5 rounded-full bg-foreground text-background font-semibold">HOJE</span>}
+                    {isBonus && <span className="text-[10px] px-2 py-0.5 rounded-full bg-success/20 text-success font-semibold">BÔNUS</span>}
+                  </div>
+                  <span className="text-xs text-muted-foreground">{d.exercises.length} ex.</span>
+                </div>
+                <div className="font-semibold text-sm">{d.name}</div>
+                {isBonus && <div className="text-xs text-muted-foreground mt-1">Sábado é opcional — só se quiser ir 💪</div>}
+              </Card>
+            );
+          })}
+          <Card className="bg-secondary/30">
+            <div className="text-xs font-semibold text-muted-foreground uppercase">Domingo</div>
+            <div className="font-semibold text-sm mt-1">Descanso</div>
+          </Card>
+        </div>
+      </Section>
+
       <Section title="Calendário (últimos 60 dias)" action={<CalendarIcon className="h-4 w-4 text-muted-foreground" />}>
         <Card>
           <div className="grid grid-cols-10 gap-1.5">
