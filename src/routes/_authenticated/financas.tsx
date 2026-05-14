@@ -28,10 +28,15 @@ const SCHEDULE = [
   { day: "Dia 25", task: "Planejar mês seguinte e ajustar metas" },
 ];
 
+const MONTHS = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+const YEARS = Array.from({ length: 11 }, (_, i) => new Date().getFullYear() + i);
+
 function FinancasPage() {
+  const now = new Date();
   const [goals, setGoals] = useState<any[]>([]);
   const [entries, setEntries] = useState<any[]>([]);
-  const [gForm, setGForm] = useState({ title: "", target_amount: "", deadline: "2027-06-30" });
+  const [gForm, setGForm] = useState({ title: "", target_amount: "", month: now.getMonth() + 1, year: now.getFullYear() + 1 });
+  const [deposits, setDeposits] = useState<Record<string, string>>({});
   const [eForm, setEForm] = useState({ type: "despesa", category: "Alimentação", amount: "", description: "" });
 
   useEffect(() => { load(); }, []);
