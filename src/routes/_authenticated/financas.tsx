@@ -211,14 +211,25 @@ function FinancasPage() {
         <div className="space-y-1.5">
           {entries.slice(0, 15).map((e) => (
             <Card key={e.id} className="!p-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-sm font-semibold">{e.description || e.category}</div>
+              <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-semibold truncate">{e.description || e.category}</div>
                   <div className="text-xs text-muted-foreground">{e.category} · {e.entry_date}</div>
                 </div>
                 <div className={`text-sm font-bold ${e.type === "receita" ? "text-success" : "text-destructive"}`}>
                   {e.type === "receita" ? "+" : "-"}R$ {Number(e.amount).toFixed(0)}
                 </div>
+                <button
+                  onClick={async () => {
+                    await supabase.from("finance_entries").delete().eq("id", e.id);
+                    toast.success("Removido");
+                    load();
+                  }}
+                  className="text-muted-foreground hover:text-destructive p-1"
+                  aria-label="Excluir"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
               </div>
             </Card>
           ))}
