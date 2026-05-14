@@ -76,12 +76,25 @@ function SonoPage() {
       <Section title="Histórico">
         <div className="space-y-1.5">
           {logs.map((l) => (
-            <Card key={l.id} className="!p-3 flex items-center justify-between">
-              <div>
+            <Card key={l.id} className="!p-3 flex items-center justify-between gap-2">
+              <div className="min-w-0">
                 <div className="text-sm font-semibold">{l.log_date}</div>
                 <div className="text-xs text-muted-foreground">{l.bedtime?.slice(0,5)} → {l.wake_time?.slice(0,5)} · {"⭐".repeat(l.quality ?? 0)}</div>
               </div>
-              <div className="text-sm font-bold">{l.hours}h</div>
+              <div className="flex items-center gap-2 shrink-0">
+                <div className="text-sm font-bold">{l.hours}h</div>
+                <button
+                  aria-label="Excluir"
+                  onClick={async () => {
+                    await supabase.from("sleep_logs").delete().eq("id", l.id);
+                    toast.success("Registro excluído");
+                    load();
+                  }}
+                  className="text-muted-foreground hover:text-destructive p-1"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
             </Card>
           ))}
           {logs.length === 0 && <Card><p className="text-sm text-muted-foreground">Nenhum registro.</p></Card>}
