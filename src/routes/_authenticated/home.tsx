@@ -179,3 +179,46 @@ function HomePage() {
     </div>
   );
 }
+
+function MonthCalendar({ completed }: { completed: Set<string> }) {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const today = now.getDate();
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const monthName = now.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+  const weekDays = ["D", "S", "T", "Q", "Q", "S", "S"];
+  const cells: (number | null)[] = [];
+  for (let i = 0; i < firstDay; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+  return (
+    <div>
+      <div className="text-sm font-semibold capitalize mb-2">{monthName}</div>
+      <div className="grid grid-cols-7 gap-1 text-center text-[10px] text-muted-foreground mb-1">
+        {weekDays.map((w, i) => <div key={i}>{w}</div>)}
+      </div>
+      <div className="grid grid-cols-7 gap-1">
+        {cells.map((d, i) => {
+          if (d === null) return <div key={i} />;
+          const iso = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+          const isDone = completed.has(iso);
+          const isToday = d === today;
+          return (
+            <div
+              key={i}
+              className={`aspect-square flex items-center justify-center rounded-md text-xs border transition ${
+                isDone
+                  ? "bg-success text-success-foreground border-success font-bold"
+                  : "bg-card border-border text-muted-foreground"
+              } ${isToday ? "ring-2 ring-primary" : ""}`}
+            >
+              {d}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
