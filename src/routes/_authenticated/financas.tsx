@@ -28,10 +28,15 @@ const SCHEDULE = [
   { day: "Dia 25", task: "Planejar mês seguinte e ajustar metas" },
 ];
 
+const MONTHS = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+const YEARS = Array.from({ length: 11 }, (_, i) => new Date().getFullYear() + i);
+
 function FinancasPage() {
+  const now = new Date();
   const [goals, setGoals] = useState<any[]>([]);
   const [entries, setEntries] = useState<any[]>([]);
-  const [gForm, setGForm] = useState({ title: "", target_amount: "", deadline: "2027-06-30" });
+  const [gForm, setGForm] = useState({ title: "", target_amount: "", month: now.getMonth() + 1, year: now.getFullYear() + 1 });
+  const [deposits, setDeposits] = useState<Record<string, string>>({});
   const [eForm, setEForm] = useState({ type: "despesa", category: "Alimentação", amount: "", description: "" });
 
   useEffect(() => { load(); }, []);
@@ -46,17 +51,20 @@ function FinancasPage() {
     if (!gForm.title || !gForm.target_amount) return;
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
+    const lastDay = new Date(gForm.year, gForm.month, 0).getDate();
+    const deadline = `${gForm.year}-${String(gForm.month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
     await supabase.from("finance_goals").insert({
-      user_id: session.user.id, title: gForm.title, target_amount: Number(gForm.target_amount), deadline: gForm.deadline,
+      user_id: session.user.id, title: gForm.title, target_amount: Number(gForm.target_amount), deadline,
       is_main: goals.length === 0,
     });
-    setGForm({ title: "", target_amount: "", deadline: gForm.deadline });
+    setGForm({ ...gForm, title: "", target_amount: "" });
     load();
   }
   async function bumpGoal(id: string, current: number, target: number, delta: number) {
     const next = Math.max(0, Math.min(target, current + delta));
     await supabase.from("finance_goals").update({ current_amount: next }).eq("id", id);
     if (next >= target) toast.success("🏆 Meta alcançada!");
+    setDeposits((d) => ({ ...d, [id]: "" }));
     load();
   }
   async function addEntry() {
@@ -85,32 +93,75 @@ function FinancasPage() {
         </div>
       </Section>
 
-      <Section title="Metas (até meio de 2027)" action={<Target className="h-4 w-4 text-muted-foreground" />}>
+      <Section title="Metas" action={<Target className="h-4 w-4 text-muted-foreground" />}>
         <Card className="space-y-2 mb-2">
           <input placeholder="Ex: Reservar R$ 10.000" value={gForm.title} onChange={(e) => setGForm({ ...gForm, title: e.target.value })} className="w-full bg-input border border-border rounded-lg px-3 py-2 text-sm" />
-          <div className="flex gap-2">
-            <input type="number" placeholder="Valor R$" value={gForm.target_amount} onChange={(e) => setGForm({ ...gForm, target_amount: e.target.value })} className="flex-1 bg-input border border-border rounded-lg px-3 py-2 text-sm" />
-            <input type="date" value={gForm.deadline} onChange={(e) => setGForm({ ...gForm, deadline: e.target.value })} className="bg-input border border-border rounded-lg px-3 py-2 text-sm" />
+          <input type="number" placeholder="Valor da meta R$" value={gForm.target_amount} onChange={(e) => setGForm({ ...gForm, target_amount: e.target.value })} className="w-full bg-input border border-border rounded-lg px-3 py-2 text-sm" />
+          <div>
+            <div className="text-xs text-muted-foreground mb-1">Atingir até:</div>
+            <div className="flex gap-2">
+              <select value={gForm.month} onChange={(e) => setGForm({ ...gForm, month: Number(e.target.value) })} className="flex-1 bg-input border border-border rounded-lg px-2 py-2 text-sm">
+                {MONTHS.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
+              </select>
+              <select value={gForm.year} onChange={(e) => setGForm({ ...gForm, year: Number(e.target.value) })} className="flex-1 bg-input border border-border rounded-lg px-2 py-2 text-sm">
+                {YEARS.map((y) => <option key={y} value={y}>{y}</option>)}
+              </select>
+            </div>
           </div>
           <button onClick={addGoal} className="w-full rounded-lg bg-primary text-primary-foreground py-2 text-sm font-semibold">+ Adicionar meta</button>
         </Card>
         <div className="space-y-2">
           {goals.map((g) => {
-            const pct = Math.min(100, Math.round((Number(g.current_amount) / Number(g.target_amount)) * 100));
+            const cur = Number(g.current_amount);
+            const tgt = Number(g.target_amount);
+            const pct = Math.min(100, Math.round((cur / tgt) * 100));
+            const remaining = Math.max(0, tgt - cur);
+            const dl = g.deadline ? new Date(g.deadline) : null;
+            const dlLabel = dl ? `${MONTHS[dl.getMonth()]}/${dl.getFullYear()}` : "—";
             return (
               <Card key={g.id}>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="font-semibold text-sm">{g.title}</div>
-                    <div className="text-xs text-muted-foreground">R$ {Number(g.current_amount).toFixed(0)} / {Number(g.target_amount).toFixed(0)} · até {g.deadline}</div>
+                    <div className="text-xs text-muted-foreground">até {dlLabel}</div>
                   </div>
                   <button onClick={async () => { await supabase.from("finance_goals").delete().eq("id", g.id); load(); }} className="text-muted-foreground"><Trash2 className="h-4 w-4" /></button>
                 </div>
-                <div className="mt-2 h-2 overflow-hidden rounded-full bg-secondary"><div className="h-full bg-success" style={{ width: `${pct}%` }} /></div>
+                <div className="mt-3 flex items-end justify-between text-xs">
+                  <span className="font-bold text-success text-base">R$ {cur.toFixed(2)}</span>
+                  <span className="text-muted-foreground">de R$ {tgt.toFixed(2)}</span>
+                </div>
+                <div className="mt-1.5 h-3 overflow-hidden rounded-full bg-secondary">
+                  <div className="h-full bg-gradient-to-r from-success to-gold transition-all duration-500" style={{ width: `${pct}%` }} />
+                </div>
+                <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
+                  <span>{pct}% concluído</span>
+                  <span>Faltam R$ {remaining.toFixed(2)}</span>
+                </div>
+                <div className="mt-3 flex gap-2">
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    placeholder="Depositar R$"
+                    value={deposits[g.id] ?? ""}
+                    onChange={(e) => setDeposits({ ...deposits, [g.id]: e.target.value })}
+                    className="flex-1 bg-input border border-border rounded-lg px-3 py-2 text-sm"
+                  />
+                  <button
+                    onClick={() => {
+                      const v = Number(deposits[g.id]);
+                      if (!v || v <= 0) { toast.error("Informe um valor"); return; }
+                      bumpGoal(g.id, cur, tgt, v);
+                    }}
+                    className="rounded-lg bg-success text-success-foreground px-4 text-sm font-semibold"
+                  >
+                    Depositar
+                  </button>
+                </div>
                 <div className="mt-2 flex gap-2">
-                  <button onClick={() => bumpGoal(g.id, Number(g.current_amount), Number(g.target_amount), 50)} className="flex-1 text-xs rounded-lg border border-border py-1.5">+50</button>
-                  <button onClick={() => bumpGoal(g.id, Number(g.current_amount), Number(g.target_amount), 100)} className="flex-1 text-xs rounded-lg border border-border py-1.5">+100</button>
-                  <button onClick={() => bumpGoal(g.id, Number(g.current_amount), Number(g.target_amount), 500)} className="flex-1 text-xs rounded-lg border border-border py-1.5">+500</button>
+                  <button onClick={() => bumpGoal(g.id, cur, tgt, 50)} className="flex-1 text-xs rounded-lg border border-border py-1.5">+50</button>
+                  <button onClick={() => bumpGoal(g.id, cur, tgt, 100)} className="flex-1 text-xs rounded-lg border border-border py-1.5">+100</button>
+                  <button onClick={() => bumpGoal(g.id, cur, tgt, 500)} className="flex-1 text-xs rounded-lg border border-border py-1.5">+500</button>
                 </div>
               </Card>
             );
