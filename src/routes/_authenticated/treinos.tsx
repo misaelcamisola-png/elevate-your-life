@@ -16,7 +16,7 @@ function TreinosPage() {
   const [planKey, setPlanKey] = useState<string>("hipertrofia_emagrecimento");
   const [completedDates, setCompletedDates] = useState<Set<string>>(new Set());
   const [todayLogId, setTodayLogId] = useState<string | null>(null);
-  const [todayChecks, setTodayChecks] = useState<Record<string, boolean>>({});
+  const [todayChecks, setTodayChecks] = useState<Record<number, boolean>>({});
   const [customs, setCustoms] = useState<any[]>([]);
   const [showCustom, setShowCustom] = useState(false);
 
