@@ -72,20 +72,21 @@ export const generateDiet = createServerFn({ method: "POST" })
     if (!profile?.weight_kg || !profile?.height_cm) {
       throw new Error("Cadastre peso e altura no perfil primeiro");
     }
+    const gw = createLovableAiGatewayProvider(process.env.LOVABLE_API_KEY!);
     const { output } = await generateText({
-      model: getModel(),
+      model: gw("google/gemini-2.5-flash"),
       output: Output.object({
         schema: z.object({
-          daily_calories: z.number(),
-          protein_g: z.number(),
-          carbs_g: z.number(),
-          fat_g: z.number(),
+          daily_calories: z.coerce.number(),
+          protein_g: z.coerce.number(),
+          carbs_g: z.coerce.number(),
+          fat_g: z.coerce.number(),
           meals: z.array(z.object({
             name: z.string(),
             time: z.string(),
             foods: z.array(z.string()),
-            calories: z.number(),
-            tip: z.string(),
+            calories: z.coerce.number(),
+            tip: z.string().optional().default(""),
           })).min(1),
           shopping_tips: z.array(z.string()).min(1),
         }),
