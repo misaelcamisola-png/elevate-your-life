@@ -9,38 +9,217 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedTreinosRouteImport } from './routes/_authenticated/treinos'
+import { Route as AuthenticatedSonoRouteImport } from './routes/_authenticated/sono'
+import { Route as AuthenticatedProgressoRouteImport } from './routes/_authenticated/progresso'
+import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
+import { Route as AuthenticatedNutricaoRouteImport } from './routes/_authenticated/nutricao'
+import { Route as AuthenticatedLeituraRouteImport } from './routes/_authenticated/leitura'
+import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
+import { Route as AuthenticatedFinancasRouteImport } from './routes/_authenticated/financas'
+import { Route as AuthenticatedFeRouteImport } from './routes/_authenticated/fe'
+import { Route as AuthenticatedCorridasRouteImport } from './routes/_authenticated/corridas'
 
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTreinosRoute = AuthenticatedTreinosRouteImport.update({
+  id: '/treinos',
+  path: '/treinos',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSonoRoute = AuthenticatedSonoRouteImport.update({
+  id: '/sono',
+  path: '/sono',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedProgressoRoute = AuthenticatedProgressoRouteImport.update({
+  id: '/progresso',
+  path: '/progresso',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedNutricaoRoute = AuthenticatedNutricaoRouteImport.update({
+  id: '/nutricao',
+  path: '/nutricao',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedLeituraRoute = AuthenticatedLeituraRouteImport.update({
+  id: '/leitura',
+  path: '/leitura',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedFinancasRoute = AuthenticatedFinancasRouteImport.update({
+  id: '/financas',
+  path: '/financas',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedFeRoute = AuthenticatedFeRouteImport.update({
+  id: '/fe',
+  path: '/fe',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedCorridasRoute = AuthenticatedCorridasRouteImport.update({
+  id: '/corridas',
+  path: '/corridas',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
+  '/corridas': typeof AuthenticatedCorridasRoute
+  '/fe': typeof AuthenticatedFeRoute
+  '/financas': typeof AuthenticatedFinancasRoute
+  '/home': typeof AuthenticatedHomeRoute
+  '/leitura': typeof AuthenticatedLeituraRoute
+  '/nutricao': typeof AuthenticatedNutricaoRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
+  '/progresso': typeof AuthenticatedProgressoRoute
+  '/sono': typeof AuthenticatedSonoRoute
+  '/treinos': typeof AuthenticatedTreinosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
+  '/corridas': typeof AuthenticatedCorridasRoute
+  '/fe': typeof AuthenticatedFeRoute
+  '/financas': typeof AuthenticatedFinancasRoute
+  '/home': typeof AuthenticatedHomeRoute
+  '/leitura': typeof AuthenticatedLeituraRoute
+  '/nutricao': typeof AuthenticatedNutricaoRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
+  '/progresso': typeof AuthenticatedProgressoRoute
+  '/sono': typeof AuthenticatedSonoRoute
+  '/treinos': typeof AuthenticatedTreinosRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
+  '/_authenticated/corridas': typeof AuthenticatedCorridasRoute
+  '/_authenticated/fe': typeof AuthenticatedFeRoute
+  '/_authenticated/financas': typeof AuthenticatedFinancasRoute
+  '/_authenticated/home': typeof AuthenticatedHomeRoute
+  '/_authenticated/leitura': typeof AuthenticatedLeituraRoute
+  '/_authenticated/nutricao': typeof AuthenticatedNutricaoRoute
+  '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/_authenticated/progresso': typeof AuthenticatedProgressoRoute
+  '/_authenticated/sono': typeof AuthenticatedSonoRoute
+  '/_authenticated/treinos': typeof AuthenticatedTreinosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/onboarding'
+    | '/corridas'
+    | '/fe'
+    | '/financas'
+    | '/home'
+    | '/leitura'
+    | '/nutricao'
+    | '/perfil'
+    | '/progresso'
+    | '/sono'
+    | '/treinos'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/onboarding'
+    | '/corridas'
+    | '/fe'
+    | '/financas'
+    | '/home'
+    | '/leitura'
+    | '/nutricao'
+    | '/perfil'
+    | '/progresso'
+    | '/sono'
+    | '/treinos'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/login'
+    | '/onboarding'
+    | '/_authenticated/corridas'
+    | '/_authenticated/fe'
+    | '/_authenticated/financas'
+    | '/_authenticated/home'
+    | '/_authenticated/leitura'
+    | '/_authenticated/nutricao'
+    | '/_authenticated/perfil'
+    | '/_authenticated/progresso'
+    | '/_authenticated/sono'
+    | '/_authenticated/treinos'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  OnboardingRoute: typeof OnboardingRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +227,115 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/treinos': {
+      id: '/_authenticated/treinos'
+      path: '/treinos'
+      fullPath: '/treinos'
+      preLoaderRoute: typeof AuthenticatedTreinosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/sono': {
+      id: '/_authenticated/sono'
+      path: '/sono'
+      fullPath: '/sono'
+      preLoaderRoute: typeof AuthenticatedSonoRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/progresso': {
+      id: '/_authenticated/progresso'
+      path: '/progresso'
+      fullPath: '/progresso'
+      preLoaderRoute: typeof AuthenticatedProgressoRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/perfil': {
+      id: '/_authenticated/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof AuthenticatedPerfilRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/nutricao': {
+      id: '/_authenticated/nutricao'
+      path: '/nutricao'
+      fullPath: '/nutricao'
+      preLoaderRoute: typeof AuthenticatedNutricaoRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/leitura': {
+      id: '/_authenticated/leitura'
+      path: '/leitura'
+      fullPath: '/leitura'
+      preLoaderRoute: typeof AuthenticatedLeituraRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/home': {
+      id: '/_authenticated/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof AuthenticatedHomeRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/financas': {
+      id: '/_authenticated/financas'
+      path: '/financas'
+      fullPath: '/financas'
+      preLoaderRoute: typeof AuthenticatedFinancasRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/fe': {
+      id: '/_authenticated/fe'
+      path: '/fe'
+      fullPath: '/fe'
+      preLoaderRoute: typeof AuthenticatedFeRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/corridas': {
+      id: '/_authenticated/corridas'
+      path: '/corridas'
+      fullPath: '/corridas'
+      preLoaderRoute: typeof AuthenticatedCorridasRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedCorridasRoute: typeof AuthenticatedCorridasRoute
+  AuthenticatedFeRoute: typeof AuthenticatedFeRoute
+  AuthenticatedFinancasRoute: typeof AuthenticatedFinancasRoute
+  AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
+  AuthenticatedLeituraRoute: typeof AuthenticatedLeituraRoute
+  AuthenticatedNutricaoRoute: typeof AuthenticatedNutricaoRoute
+  AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
+  AuthenticatedProgressoRoute: typeof AuthenticatedProgressoRoute
+  AuthenticatedSonoRoute: typeof AuthenticatedSonoRoute
+  AuthenticatedTreinosRoute: typeof AuthenticatedTreinosRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedCorridasRoute: AuthenticatedCorridasRoute,
+  AuthenticatedFeRoute: AuthenticatedFeRoute,
+  AuthenticatedFinancasRoute: AuthenticatedFinancasRoute,
+  AuthenticatedHomeRoute: AuthenticatedHomeRoute,
+  AuthenticatedLeituraRoute: AuthenticatedLeituraRoute,
+  AuthenticatedNutricaoRoute: AuthenticatedNutricaoRoute,
+  AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
+  AuthenticatedProgressoRoute: AuthenticatedProgressoRoute,
+  AuthenticatedSonoRoute: AuthenticatedSonoRoute,
+  AuthenticatedTreinosRoute: AuthenticatedTreinosRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  LoginRoute: LoginRoute,
+  OnboardingRoute: OnboardingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
