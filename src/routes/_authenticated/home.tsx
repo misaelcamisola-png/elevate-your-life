@@ -42,6 +42,7 @@ function HomePage() {
   const { profile } = useProfile();
   const [checklist, setChecklist] = useState<Checklist>(emptyChecklist());
   const [streak, setStreak] = useState(0);
+  const [completedDays, setCompletedDays] = useState<Set<string>>(new Set());
 
   useEffect(() => { load(); }, []);
 
@@ -50,13 +51,19 @@ function HomePage() {
     if (!session) return;
     const today = todayISO();
     const { data } = await supabase.from("daily_checklist").select("*").eq("user_id", session.user.id).eq("log_date", today).maybeSingle();
-    if (data) setChecklist(data as any);
+    if (data) setChecklist(data as any); else setChecklist(emptyChecklist());
 
     // streak: contar dias consecutivos com pelo menos 3/5 marcados
     const { data: hist } = await supabase.from("daily_checklist").select("*").eq("user_id", session.user.id).order("log_date", { ascending: false }).limit(60);
     let s = 0;
     const oneDay = 86400000;
     let cursor = new Date().setHours(0,0,0,0);
+    const completed = new Set<string>();
+    for (const row of hist ?? []) {
+      const allDone = ITEMS.every((it) => (row as any)[it.key]);
+      if (allDone) completed.add(row.log_date as string);
+    }
+    setCompletedDays(completed);
     for (const row of hist ?? []) {
       const d = new Date(row.log_date as any).setHours(0,0,0,0);
       if (d !== cursor) break;
