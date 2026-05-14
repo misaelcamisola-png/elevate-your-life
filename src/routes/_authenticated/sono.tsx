@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PageHeader, Card, Section } from "@/components/ui-kit";
 import { todayISO } from "@/lib/date-utils";
 import { toast } from "sonner";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/sono")({
   component: SonoPage,
