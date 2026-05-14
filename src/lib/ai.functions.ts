@@ -37,17 +37,18 @@ export const getDailyContent = createServerFn({ method: "GET" })
       model: getModel(),
       output: Output.object({
         schema: z.object({
-          prayers: z.array(z.object({ theme: z.string(), text: z.string() })).length(3),
-          verses: z.array(z.object({ reference: z.string(), text: z.string(), reflection: z.string() })).length(2),
+          prayers: z.array(z.object({ theme: z.string(), text: z.string() })).min(1).max(5),
+          verses: z.array(z.object({ reference: z.string(), text: z.string(), reflection: z.string() })).min(1).max(4),
           gratitude_tip: z.string(),
           saving_tip: z.string(),
         }),
       }),
       prompt: `Gere conteúdo diário em português brasileiro para um app de disciplina cristã.
-- 3 orações curtas (3-5 frases cada), uma para cada tema: ${pick.join("; ")}.
-- 2 versículos da Bíblia com referência (livro capítulo:verso), texto e uma reflexão de 1 frase.
-- 1 dica curta de gratidão (1 frase).
-- 1 dica curta de economia financeira (1 frase).
+Retorne EXATAMENTE:
+- prayers: 3 orações curtas (3-5 frases cada), uma para cada tema: ${pick.join("; ")}.
+- verses: 2 versículos da Bíblia com referência (livro capítulo:verso), texto e uma reflexão de 1 frase.
+- gratitude_tip: 1 dica curta de gratidão (1 frase).
+- saving_tip: 1 dica curta de economia financeira (1 frase).
 Tom: motivacional, simples, direto.`,
     });
 
@@ -85,15 +86,16 @@ export const generateDiet = createServerFn({ method: "POST" })
             foods: z.array(z.string()),
             calories: z.number(),
             tip: z.string(),
-          })).min(4).max(6),
-          shopping_tips: z.array(z.string()).min(3),
+          })).min(1),
+          shopping_tips: z.array(z.string()).min(1),
         }),
       }),
       prompt: `Monte uma dieta de emagrecimento em português brasileiro, BARATA e FÁCIL de manter, para:
 peso ${profile.weight_kg}kg, altura ${profile.height_cm}cm, idade ${profile.age ?? "adulto"}, sexo ${profile.sex ?? "não informado"}, objetivo: ${profile.goal ?? "emagrecer"}.
 Use ingredientes acessíveis no Brasil (arroz, feijão, ovos, frango, batata-doce, banana, aveia etc).
-Inclua café da manhã, lanche, almoço, lanche da tarde, jantar e ceia se fizer sentido.
-Para cada refeição, dê horário sugerido, lista de alimentos com porções, calorias estimadas e uma dica curta.`,
+Retorne 4 a 6 refeições (café da manhã, lanche, almoço, lanche da tarde, jantar e ceia se fizer sentido).
+Para cada refeição: name, time (HH:MM), foods (lista com porções), calories (número) e tip curta.
+Inclua também daily_calories, protein_g, carbs_g, fat_g (números) e shopping_tips (3+ dicas).`,
     });
     await supabase.from("profiles").update({ diet_plan: output, updated_at: new Date().toISOString() }).eq("id", userId);
     return output;
