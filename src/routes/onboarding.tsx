@@ -79,8 +79,42 @@ function Onboarding() {
           <Field label="Seu nome">
             <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="input" placeholder="Como devo te chamar?" />
           </Field>
-          <Field label="Foto de perfil (URL)">
-            <input value={form.avatar_url} onChange={(e) => setForm({ ...form, avatar_url: e.target.value })} className="input" placeholder="https://..." />
+          <Field label="Foto de perfil">
+            <div className="flex items-center gap-3">
+              <div className="h-16 w-16 rounded-full bg-card border border-border overflow-hidden flex items-center justify-center text-xs text-muted-foreground shrink-0">
+                {form.avatar_url ? <img src={form.avatar_url} alt="avatar" className="h-full w-full object-cover" /> : "Sem foto"}
+              </div>
+              <label className="flex-1 cursor-pointer rounded-xl border border-border bg-card px-4 py-3 text-center text-sm hover:bg-muted">
+                {uploading ? "Enviando..." : (form.avatar_url ? "Trocar foto" : "Escolher da galeria")}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  disabled={uploading}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    setUploading(true);
+                    try {
+                      const { data: { session } } = await supabase.auth.getSession();
+                      if (!session) throw new Error("Sessão expirada");
+                      const ext = file.name.split(".").pop() || "jpg";
+                      const path = `${session.user.id}/avatar-${Date.now()}.${ext}`;
+                      const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, { upsert: true, contentType: file.type });
+                      if (upErr) throw upErr;
+                      const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
+                      setForm((f) => ({ ...f, avatar_url: pub.publicUrl }));
+                      toast.success("Foto enviada!");
+                    } catch (err: any) {
+                      toast.error(err.message ?? "Erro no upload");
+                    } finally {
+                      setUploading(false);
+                      e.target.value = "";
+                    }
+                  }}
+                />
+              </label>
+            </div>
           </Field>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Peso (kg)">
