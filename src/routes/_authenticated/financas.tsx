@@ -51,17 +51,20 @@ function FinancasPage() {
     if (!gForm.title || !gForm.target_amount) return;
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
+    const lastDay = new Date(gForm.year, gForm.month, 0).getDate();
+    const deadline = `${gForm.year}-${String(gForm.month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
     await supabase.from("finance_goals").insert({
-      user_id: session.user.id, title: gForm.title, target_amount: Number(gForm.target_amount), deadline: gForm.deadline,
+      user_id: session.user.id, title: gForm.title, target_amount: Number(gForm.target_amount), deadline,
       is_main: goals.length === 0,
     });
-    setGForm({ title: "", target_amount: "", deadline: gForm.deadline });
+    setGForm({ ...gForm, title: "", target_amount: "" });
     load();
   }
   async function bumpGoal(id: string, current: number, target: number, delta: number) {
     const next = Math.max(0, Math.min(target, current + delta));
     await supabase.from("finance_goals").update({ current_amount: next }).eq("id", id);
     if (next >= target) toast.success("🏆 Meta alcançada!");
+    setDeposits((d) => ({ ...d, [id]: "" }));
     load();
   }
   async function addEntry() {
