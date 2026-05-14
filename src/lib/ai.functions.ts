@@ -37,17 +37,18 @@ export const getDailyContent = createServerFn({ method: "GET" })
       model: getModel(),
       output: Output.object({
         schema: z.object({
-          prayers: z.array(z.object({ theme: z.string(), text: z.string() })).length(3),
-          verses: z.array(z.object({ reference: z.string(), text: z.string(), reflection: z.string() })).length(2),
+          prayers: z.array(z.object({ theme: z.string(), text: z.string() })).min(1).max(5),
+          verses: z.array(z.object({ reference: z.string(), text: z.string(), reflection: z.string() })).min(1).max(4),
           gratitude_tip: z.string(),
           saving_tip: z.string(),
         }),
       }),
       prompt: `Gere conteúdo diário em português brasileiro para um app de disciplina cristã.
-- 3 orações curtas (3-5 frases cada), uma para cada tema: ${pick.join("; ")}.
-- 2 versículos da Bíblia com referência (livro capítulo:verso), texto e uma reflexão de 1 frase.
-- 1 dica curta de gratidão (1 frase).
-- 1 dica curta de economia financeira (1 frase).
+Retorne EXATAMENTE:
+- prayers: 3 orações curtas (3-5 frases cada), uma para cada tema: ${pick.join("; ")}.
+- verses: 2 versículos da Bíblia com referência (livro capítulo:verso), texto e uma reflexão de 1 frase.
+- gratitude_tip: 1 dica curta de gratidão (1 frase).
+- saving_tip: 1 dica curta de economia financeira (1 frase).
 Tom: motivacional, simples, direto.`,
     });
 
