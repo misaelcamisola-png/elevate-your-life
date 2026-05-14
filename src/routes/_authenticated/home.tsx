@@ -150,6 +150,16 @@ function HomePage() {
         </div>
       </Section>
 
+      <Section title="Calendário do mês">
+        <Card>
+          <MonthCalendar completed={completedDays} />
+          <div className="mt-3 flex items-center gap-3 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded bg-success" /> Dia completo</span>
+            <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded border border-border" /> Pendente</span>
+          </div>
+        </Card>
+      </Section>
+
       <Section title="Frase do dia">
         <Card className="flex gap-3">
           <Quote className="h-5 w-5 shrink-0 text-gold" />
