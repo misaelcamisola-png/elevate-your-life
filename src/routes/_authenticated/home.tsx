@@ -42,6 +42,7 @@ function HomePage() {
   const { profile } = useProfile();
   const [checklist, setChecklist] = useState<Checklist>(emptyChecklist());
   const [streak, setStreak] = useState(0);
+  const [completedDays, setCompletedDays] = useState<Set<string>>(new Set());
 
   useEffect(() => { load(); }, []);
 
@@ -50,13 +51,19 @@ function HomePage() {
     if (!session) return;
     const today = todayISO();
     const { data } = await supabase.from("daily_checklist").select("*").eq("user_id", session.user.id).eq("log_date", today).maybeSingle();
-    if (data) setChecklist(data as any);
+    if (data) setChecklist(data as any); else setChecklist(emptyChecklist());
 
     // streak: contar dias consecutivos com pelo menos 3/5 marcados
     const { data: hist } = await supabase.from("daily_checklist").select("*").eq("user_id", session.user.id).order("log_date", { ascending: false }).limit(60);
     let s = 0;
     const oneDay = 86400000;
     let cursor = new Date().setHours(0,0,0,0);
+    const completed = new Set<string>();
+    for (const row of hist ?? []) {
+      const allDone = ITEMS.every((it) => (row as any)[it.key]);
+      if (allDone) completed.add(row.log_date as string);
+    }
+    setCompletedDays(completed);
     for (const row of hist ?? []) {
       const d = new Date(row.log_date as any).setHours(0,0,0,0);
       if (d !== cursor) break;
@@ -143,6 +150,16 @@ function HomePage() {
         </div>
       </Section>
 
+      <Section title="Calendário do mês">
+        <Card>
+          <MonthCalendar completed={completedDays} />
+          <div className="mt-3 flex items-center gap-3 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded bg-success" /> Dia completo</span>
+            <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded border border-border" /> Pendente</span>
+          </div>
+        </Card>
+      </Section>
+
       <Section title="Frase do dia">
         <Card className="flex gap-3">
           <Quote className="h-5 w-5 shrink-0 text-gold" />
@@ -159,6 +176,49 @@ function HomePage() {
           <div>🙏 Oração: ao acordar e antes de dormir</div>
         </Card>
       </Section>
+    </div>
+  );
+}
+
+function MonthCalendar({ completed }: { completed: Set<string> }) {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const today = now.getDate();
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const monthName = now.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+  const weekDays = ["D", "S", "T", "Q", "Q", "S", "S"];
+  const cells: (number | null)[] = [];
+  for (let i = 0; i < firstDay; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+  return (
+    <div>
+      <div className="text-sm font-semibold capitalize mb-2">{monthName}</div>
+      <div className="grid grid-cols-7 gap-1 text-center text-[10px] text-muted-foreground mb-1">
+        {weekDays.map((w, i) => <div key={i}>{w}</div>)}
+      </div>
+      <div className="grid grid-cols-7 gap-1">
+        {cells.map((d, i) => {
+          if (d === null) return <div key={i} />;
+          const iso = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+          const isDone = completed.has(iso);
+          const isToday = d === today;
+          return (
+            <div
+              key={i}
+              className={`aspect-square flex items-center justify-center rounded-md text-xs border transition ${
+                isDone
+                  ? "bg-success text-success-foreground border-success font-bold"
+                  : "bg-card border-border text-muted-foreground"
+              } ${isToday ? "ring-2 ring-primary" : ""}`}
+            >
+              {d}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
