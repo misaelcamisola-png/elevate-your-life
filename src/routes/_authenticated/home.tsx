@@ -115,19 +115,19 @@ function HomePage() {
         <Card>
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-3xl font-bold">{pct}%</div>
-              <div className="text-xs text-muted-foreground mt-0.5">{done} de {ITEMS.length} concluídos</div>
+              <div className="text-2xl font-bold leading-none">{pct}%</div>
+              <div className="text-[10px] text-muted-foreground mt-0.5">{done}/{ITEMS.length} concluídos</div>
             </div>
-            <Trophy className={`h-8 w-8 ${pct === 100 ? "text-gold" : "text-muted-foreground/40"}`} />
+            <Trophy className={`h-6 w-6 ${pct === 100 ? "text-gold" : "text-muted-foreground/40"}`} />
           </div>
-          <div className="mt-3 h-2 overflow-hidden rounded-full bg-secondary">
+          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-secondary">
             <div className="h-full bg-success transition-all" style={{ width: `${pct}%` }} />
           </div>
         </Card>
       </Section>
 
       <Section title="Checklist do dia">
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {ITEMS.map((it) => {
             const Icon = it.icon;
             const checked = checklist[it.key];
@@ -135,14 +135,14 @@ function HomePage() {
               <button
                 key={it.key}
                 onClick={() => toggle(it.key)}
-                className={`flex w-full items-center gap-3 rounded-2xl border p-4 text-left transition ${checked ? "border-success/40 bg-success/10" : "border-border bg-card"}`}
+                className={`flex w-full items-center gap-2.5 rounded-xl border px-3 py-2 text-left text-sm transition ${checked ? "border-success/40 bg-success/10" : "border-border bg-card"}`}
               >
-                <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${checked ? "bg-success/20 text-success" : "bg-secondary text-muted-foreground"}`}>
-                  <Icon className="h-5 w-5" />
+                <div className={`flex h-7 w-7 items-center justify-center rounded-lg ${checked ? "bg-success/20 text-success" : "bg-secondary text-muted-foreground"}`}>
+                  <Icon className="h-4 w-4" />
                 </div>
                 <span className={`flex-1 ${checked ? "line-through text-muted-foreground" : ""}`}>{it.label}</span>
-                <div className={`h-5 w-5 rounded-md border-2 ${checked ? "border-success bg-success" : "border-border"} flex items-center justify-center`}>
-                  {checked && <span className="text-xs text-success-foreground">✓</span>}
+                <div className={`h-4 w-4 rounded border-2 ${checked ? "border-success bg-success" : "border-border"} flex items-center justify-center`}>
+                  {checked && <span className="text-[10px] text-success-foreground">✓</span>}
                 </div>
               </button>
             );
@@ -153,25 +153,25 @@ function HomePage() {
       <Section title="Calendário do mês">
         <Card>
           <MonthCalendar completed={completedDays} />
-          <div className="mt-3 flex items-center gap-3 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded bg-success" /> Dia completo</span>
-            <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded border border-border" /> Pendente</span>
+          <div className="mt-2 flex items-center gap-3 text-[10px] text-muted-foreground">
+            <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded bg-success" /> Completo</span>
+            <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded border border-border" /> Pendente</span>
           </div>
         </Card>
       </Section>
 
       <Section title="Frase do dia">
-        <Card className="flex gap-3">
-          <Quote className="h-5 w-5 shrink-0 text-gold" />
-          <p className="text-sm">{todayQuote()}</p>
+        <Card className="flex gap-2">
+          <Quote className="h-4 w-4 shrink-0 text-gold" />
+          <p className="text-xs">{todayQuote()}</p>
         </Card>
       </Section>
 
       <Section title="Lembretes">
-        <Card className="space-y-2 text-sm text-muted-foreground">
+        <Card className="space-y-1 text-xs text-muted-foreground">
           <div>💧 Água: 7h, 10h, 13h, 16h, 19h, 21h</div>
           <div>🍽️ Refeições: 7h30, 10h, 12h30, 16h, 20h</div>
-          <div>🏋️ Treino: 6h da manhã. Sem desculpa!</div>
+          <div>🏋️ Treino: 6h da manhã</div>
           <div>📖 Leitura: 22h antes de dormir</div>
           <div>🙏 Oração: ao acordar e antes de dormir</div>
         </Card>
