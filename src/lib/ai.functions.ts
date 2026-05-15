@@ -1,16 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { generateText, Output } from "ai";
-import { createLovableAiGatewayProvider } from "./ai-gateway";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-
-function getModel() {
-  const key = process.env.LOVABLE_API_KEY;
-  if (!key) throw new Error("LOVABLE_API_KEY ausente");
-  const gw = createLovableAiGatewayProvider(key);
-  return gw("google/gemini-3-flash-preview");
-}
+import { getDailyPrayerThemes, getLovableAiModel } from "./ai.server";
 
 // ----- Conteúdo diário compartilhado: 3 orações + 2 versículos + dicas
 export const getDailyContent = createServerFn({ method: "GET" })
@@ -24,17 +17,10 @@ export const getDailyContent = createServerFn({ method: "GET" })
       .maybeSingle();
     if (existing) return existing;
 
-    const themes = [
-      "sucesso pessoal e profissional",
-      "proteção da família",
-      "ajudar os enfermos e doentes da família",
-      "ajudar pessoas necessitadas",
-      "vida financeira e prosperidade nos negócios",
-    ];
-    const pick = [0, 1, 2].map((i) => themes[(new Date().getDate() + i) % themes.length]);
+    const pick = getDailyPrayerThemes();
 
     const { output } = await generateText({
-      model: getModel(),
+      model: getLovableAiModel(),
       output: Output.object({
         schema: z.object({
           prayers: z.array(z.object({ theme: z.string(), text: z.string() })).min(1).max(5),
@@ -72,9 +58,8 @@ export const generateDiet = createServerFn({ method: "POST" })
     if (!profile?.weight_kg || !profile?.height_cm) {
       throw new Error("Cadastre peso e altura no perfil primeiro");
     }
-    const gw = createLovableAiGatewayProvider(process.env.LOVABLE_API_KEY!);
     const { output } = await generateText({
-      model: gw("google/gemini-2.5-flash"),
+      model: getLovableAiModel("google/gemini-2.5-flash"),
       output: Output.object({
         schema: z.object({
           daily_calories: z.coerce.number(),
