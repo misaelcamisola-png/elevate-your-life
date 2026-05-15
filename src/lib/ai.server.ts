@@ -1,3 +1,8 @@
+import {
+  defaultSettingsMiddleware,
+  extractJsonMiddleware,
+  wrapLanguageModel,
+} from "ai";
 import { createLovableAiGatewayProvider } from "./ai-gateway";
 
 export function getLovableAiModel(modelName = "google/gemini-3-flash-preview") {
@@ -6,6 +11,27 @@ export function getLovableAiModel(modelName = "google/gemini-3-flash-preview") {
 
   const gateway = createLovableAiGatewayProvider(key);
   return gateway(modelName);
+}
+
+export function getStructuredLovableAiModel(
+  modelName = "google/gemini-3-flash-preview",
+  settings: {
+    maxOutputTokens?: number;
+    temperature?: number;
+  } = {},
+) {
+  return wrapLanguageModel({
+    model: getLovableAiModel(modelName),
+    middleware: [
+      extractJsonMiddleware(),
+      defaultSettingsMiddleware({
+        settings: {
+          temperature: settings.temperature ?? 0.3,
+          maxOutputTokens: settings.maxOutputTokens ?? 2048,
+        },
+      }),
+    ],
+  });
 }
 
 export function getDailyPrayerThemes(date = new Date()) {
